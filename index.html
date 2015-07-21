@@ -1,1 +1,233 @@
-Hello World!
+<h1>Creare di campagne di Mass Mailing con Odoo 8.0</h1>
+
+                <h2>Setting up</h2>
+
+                <p>Questa guida parte dal presupposto che sul vostro server sia installato Odoo 8.0 ed attivo il modulo marketing. </p>
+
+                <p>Per avere il vostro ambiente correttamente configurato e funzionante potete fare riferimento a questi link :</p>
+
+                <p><a href="https://www.odoo.com/documentation/8.0/setup/install.html">documentazione
+ufficiale odoo</a>
+                </p>
+
+                <p><a href="http://abstract.it/lab/articles/odoo-installazione-e-prima-configurazione">guida
+in italiano di Davide Corio di Abstract</a>
+                </p>
+
+                <p>Una volta installato il vostro ambiente ed installata l’app di Marketing di Odoo dobbiamo passare ad installare il modulo Mass Mailing.</p>
+
+                <p>Un semplice click nell’area di configurazione vi permetterà di avere il tutto correttamente configurato. Il mio consiglio è di installare anche il modulo Campaign in Mass Mailing, che vi permetterà di correlare le vostre azioni di Mass Mailing alle campagne di Marketing in atto.</p>
+
+                <p>A questo punto dobbiamo configurare il server di posta in uscita. Quando parliamo di email marketing il primo problema da affrontare è la deliverability delle nostre comunicazione. In un mondo sempre più saturo di <a href="https://it.wikipedia.org/wiki/Spam">SPAM e UCE</a>, un portale che invia automaticamente email ad un numero consistente di destinatari verrebbe subito blacklistato. Avrete serissimi problemi con il dominio delle vostre email che avrete utilizzato come mittente fino addirittura ad un blocco dell’IP del server in uscita.</p>
+
+                <p>Evitate ad ogni costo di fare questa operazione e dotateti di un SMTP pensato per l’email marketing.</p>
+
+                <p>In questa guida vi consiglio l’eccellente servizio <a href="https://www.mandrill.com/">Mandrill </a>di <a href="http://mailchimp.com/">Mailchimp</a>. Mailchimp è un leader mondiale nelle soluzioni di email marketing e qualche tempo fa ha rilasciato una API di Email Delivery chiamata appunto Mandrill. Registrandovi al sito e selezionando il volume di email mensile che prevedete (gratuito) verrà creato per voi un SMTP da poter utilizzare per le email in uscita da Odoo.</p>
+
+                <p>A questo punto andiamo Configurazione-&gt;Technical-&gt;Email-&gt;Server della posta in Uscita.</p>
+
+                <p>Creiamo un nuovo server ed inseriamo i parametri che abbiamo ottenuto da Mandrill. Non mi dilungo troppo sulla configurazione di questo servizio perché <a href="https://mandrillapp.com/docs/?_ga=1.220942552.1333781570.1436187470">ottimamente
+documentato nel loro sito</a>.</p>
+
+                <p>Vi sottolineo solo un elemento importante. Mandrill non vi garantisce il risultato ottimale nei confronti dello spam. Il punteggio di spam è composto da vari fattori (indirizzo email del mittente, reply-to, qualità del codice del messaggio, link di disiscrizione) e dovrete tenere tutti questi parametri sotto controllo se vorrete essere sicuri che le vostre campagne arrivino ai destinatari.
+                </p>
+
+                <p>Per questo motivo, sempre in fase di configurazione il mio consiglio è di mettere un destinatario opportunamente configurato e che risponda ad un indirizzo reale ed attivo e di non utilizzare un reply-to diverso dal mittente. Vedremo in costruzione del nostro template come fare.</p>
+
+                <p>A questo punto la configurazione tecnica è terminata. Possiamo passare a creare il nostro messaggio.</p>
+
+                <h2>Creare il template</h2>
+
+                <p>Tutto il nuovo sistema Odoo si basa su template che vengono utilizzati per generare le viste di email, sito web e report.</p>
+
+                <p>Per la nostra campagna abbiamo bisogno di una struttura base che possa essere utilizzata come supporto sulla quale andare ad inserire il nostro messaggio. Al momento della stesura di questa guida il sistema di drag&amp;drop è molto acerba e dovremo fare un piccolo workaround per ottenere il risultato voluto.</p>
+
+                <p>Il template messo a disposizione dal sistema è assolutamente neutro e se soddisfa le nostre esigenze possiamo partire da quello per creare il nostro messaggio.</p>
+
+                <p>Io avevo bisogno di qualcosa di più robusto e quindi mi sono creato un mio template in HTML che ho poi inserito all’interno del sistema Odoo per poi riutilizzarlo nelle comunicazioni verso i clienti.</p>
+
+                <p>Il mio consiglio è di partire da un template robusto per l’email marketing. Potete basarvi su <a href="https://internations.github.io/antwort/">AntWort su  Github</a>. Questo progetto vi permette di avere un framework per email responsive che potrete utilizzare per costruire il vostro template in linea con l’immagine aziendale. Il progetto è Open Source quindi evitiamo di fare gli Open con il Source degli altri e se troviamo qualche miglioramento o aggiunta ricondividiamo con la comunità.
+                </p>
+
+                <p>Quando sarete pronti con il vostro template dovrete mettere in linea tutti gli stili. L’email marketing lavora molto male con gli header e tra l’altro Odoo non vi permette di modificarli.</p>
+
+                <p>Possiamo quindi passare per un servizio di styling inline come <a href="https://inlinestyler.torchbox.com/">InlineStyler</a>. Lo trovo molto efficace e vi dà anche indicazioni sulla compatibilità del vostro codice fra i vari email reader.</p>
+
+                <p>Cercate di essere puliti e W3C compliant, un codice sporco aumenta il punteggio di spam.</p>
+
+                <p>Una volta creato il vostro template dovete farlo diventare un template riutilizzabile in Odoo.</p>
+
+                <p>Andate quindi in Marketing-&gt;Mass Mailing-&gt; Mail Template e cliccate su crea.</p>
+
+                <p>Inserite un titolo mnemonico, applicatelo a Mass Mailing Contact e cliccate sulle parentesi angolari per visualizzare il solo codice.</p>
+
+                <p>A questo punto inserite l’output dell’Inline Styler e salvate.
+                </p>
+
+                <p>Avete creato il vostro template istituzionale. Potete valutare di farne altri con layout diversi (1 colonna, 2 colonne, ecc) per avere un po’ di flessibilità nei layout.</p>
+
+                <p>Ora possiamo dare alcune configurazioni aggiuntive al nostro template.
+                </p>
+
+                <p>Andiamo su Configurazione-&gt;Technical-&gt;Email-&gt;Template. Cerchiamo il nostro template appena creato ed entriamo per modificare.</p>
+
+                <p>Cliccando su modifica potremo navigare sui tre tab. Nel tab configurazione email inseriamo la email che sarà di default come mittente. Cerchiamo di utilizzare un indirizzo reale e funzionante che possibilmente non sia un indirizzo personale di un dipendente e non sia INFO.</p>
+
+                <p>Nelle impostazioni avanzate selezioniamo l’SMTP che abbiamo creato con il servizio Mandrill per essere sicuri della deliverability.</p>
+
+                <p>A questo punto siamo pronti per far partire la nostra prima campagna.
+                </p>
+
+                <h2>Creare la prima campagna</h2>
+
+                <p>Dato che questa guida consiglia l’utilizzo del modulo Campaign in Mass Mailing, cominciamo col creare la nostra campagna di marketing all’interno di Odoo. </p>
+
+                <p>Andiamo su Marketing e clicchiamo su Campaign all’interno del Tab Mass Mailing. Nel box di destra clicchiamo sul pulsante Crea.</p>
+
+                <p>Inserite il nome della campagna (es. “Promozione Estate 2015”) e salvate.</p>
+
+                <p>A questo punto passiamo al mailing vero e proprio. Andiamo sul tab Mass Mailing e clicchiamo sul pulsante crea. Ci troveremo il campo From precompilato con i nostri dati di login (dati che verranno sovrascritti dalla configurazione del template), il subject della comunicazione ed i Recipients. </p>
+
+                <p>Tra i recipients possiamo selezionare dei Leads/Opportunità, Clienti nel nostro database o una mailing list che abbiamo precedentemente creato nell’apposita sezione “Mailing List”.</p>
+
+                <p>Ho scelto di pubblicare una guida sul Mass Mailing con Odoo proprio per la sua eccellente integrazione con il CRM e quindi mi dedicherò alle email che arriveranno al vostro db clienti.</p>
+
+                <p>Per le altre operazioni esistono molti servizi online e non è necessario avere un ambiente come Odoo per fare quel tipo di invii.</p>
+
+                <p>Scegliamo quindi nei destinatari i nostri clienti. Qui possiamo lavorare con i filtri di Odoo andando a creare invii segmentanti per commerciale, opportunità e tanti altri parametri. Utilizzando correttamente il filtraggio possiamo avere funzionalità veramente efficaci per le nostre campagne.
+                </p>
+
+                <p>Una volta definito il nostro pubblico passiamo alla creatività.
+                </p>
+
+                <p>Clicchiamo su Design Email e ci troveremo un cambio di interfaccia. Il sistema infatti ci fa creare il nostro messaggio attraverso l’interfaccia del sito web. Scegliamo il template che avevamo precedentemente realizzato.
+                </p>
+
+                <p>A questo punto vedremo apparire il nostro layout all’interno di un sistema WSIWYG. Se avete scelto questa strada sappiate che gli elementi che fornisce il sistema sono di blocco e quindi non posso essere inseriti dentro il vostro layout. Rimarranno all’esterno e al momento in cui viene scritta questa guida non potranno essere stilizzati.</p>
+
+                <p>Per questo io preferisco rimanere all’interno del mio layout cercando di limitare l’utilizzo dei blocchi esterni.</p>
+
+                <p>Una volta composto il messaggio salviamo il template e clicchiamo su “Back to Mass Mailing”. Il nostro messaggio è pronto e non resta che testarlo ed inviarlo.</p>
+
+                <p>Il mondo dell’email marketing è sempre complesso data la varietà di email reader che andranno a ricevere la nostra comunicazione. E’ sempre meglio fare vari test prima di inviare la campagna.</p>
+
+                <p>&nbsp;</p>
+
+                <p><span>Impostare il monitoraggio</span>
+                </p>
+
+                <p><span>Alla partenza della
+campagna avremo tre livelli di monitoraggio.</span>
+                </p>
+
+                <h3>Monitoraggio attraverso i tool interni di Odoo. </h3>
+
+                <p><span>Odoo dispone di una serie
+di strumenti che vi permetto di analizzare la reattività dei vostri utenti. Ad
+ogni email il sistema vi indicherà l’apertura e le risposte ricevute dal
+messaggio. Abbiamo sfruttato il sistema odoo per creare questa campagna
+soprattutto per la sua funzione di soluzione aziendale completa. Se avremo
+configurato correttamente il legame fra il mass mailing e la campagna di
+marketing potremo avere nel CRM i dati di lettura e far seguire quindi azioni
+commerciali alle nostre operazioni di marketing, in un ottimo funnel di
+vendita.</span>
+                </p>
+
+                <h3>Dati ricavabili da Mandrill</h3>
+
+                <p><span>Dato che le nostre email
+passano per un server esterno, Mandrill ci offre una serie di interessantissime
+statistiche per le nostre operazioni.</span>
+                </p>
+
+                <p><span>Nei report avremo dati
+demografici, deliverability e reputation. Soprattutto gli ultimi due sono
+particolarmente importanti per capire se le nostre comunicazioni stanno
+soffrendo di un punteggio di spam elevato e non stiamo quindi riuscendo ad
+avere una buona deliverabilty.</span>
+                </p>
+
+                <h3>Google Analytics</h3>
+
+                <p><span>Se seguite questo blog
+sapete che principalmente mi occupo di web analysis con Google Analytics. Se
+nella vostra campagna è presente un link che porta ad un sito web monitorato
+con Google </span>
+                </p>
+
+                <p><span>Analytics, potrete
+ottenere tantissime informazioni riguardo il comportamento dei vostri utenti.</span>
+                </p>
+
+                <p><span>La prima cosa da
+configurare è il monitoraggio degli URL. Dobbiamo inserire alla fine dei nostri
+link una serie di parametri UTM che permetteranno a GA di correlare i dati di
+navigazione degli utenti con la sorgente di traffico (in questo caso la nostra
+campagna). Per fare questo possiamo utilizzare il tool </span><a href="https://support.google.com/analytics/answer/1033867?hl=en"><span
+>URL Builder di Google</span></a><span>. Come vedrete è molto semplice
+da utilizzare e ben documentato.</span>
+                </p>
+
+                <p><span>Attraverso questa
+configurazione vi ritrovere in analytics la possibilità di filtrare il traffico
+per sorgente di traffico, campagna, e mezzo.</span>
+                </p>
+
+                <p><span>Il mio consiglio è di
+configurarli cosi:</span>
+                </p>
+
+                <p><span>Sorgente di traffico :
+Odoo (non cambiatelo mai)</span>
+                </p>
+
+                <p><span>Campagna : Nome
+significativo legato all’oggetto del messaggio da cambiare ad ogni invio</span>
+                </p>
+
+                <p><span>Mezzo : Email (non
+cambiatelo mai)</span>
+                </p>
+
+                <p><span>Rimando ad altri articoli
+la comprensione delle statistiche di email marketing. In questa piccola guida
+vi do solo quale spunto.</span>
+                </p>
+
+                <p><span>Monitorando i dati
+filtrati a livello campagna potrete capire come la singola operazione stia
+andando.</span>
+                </p>
+
+                <p><span>Monitorando la sorgente di
+traffico potrete confrontare le varie campagne per capire le varie
+performances.</span>
+                </p>
+
+                <p><span>Monitorando il mezzo
+potrete confrontare il comportamento dei vostri utenti verso messaggi che
+arrivano via email da vari fornitori, capendone differenze e creando
+benchmarks.</span>
+                </p>
+
+                <p>&nbsp;</p>
+
+                <h2>Monitoraggio custom con Google Analytics</h2>
+                </p>
+
+                <p>&nbsp;</p>
+
+                <p><span>Come ben spiegato in </span><a href="http://www.amazon.com/Google-Analytics-Integrations-Daniel-Waisberg/dp/1119053064"><span
+>questo libro</span></a><span> </span><a href="http://www.amazon.com/Google-Analytics-Integrations-Daniel-Waisberg/dp/1119053064"><span
+>Google Analytics Integration</span></a><span> possiamo utilizzare
+Google Analytics per monitorare la reattività dei nostri lettori non solo
+quando cliccano sul nostro sito web ma all’interno della DEM.</span>
+                </p>
+
+                <p><span>E’ abbastanza laborioso ed
+odoo vi fornisce già una buona base di statistiche di questo tipo. Può
+diventare però interessante far monitorare ad analytics questo tipo di dati per
+creare segmentazioni ed analisi ancora più profonde delle precedenti.</span>
+                </p>
+
+                <p>&nbsp;</p>
